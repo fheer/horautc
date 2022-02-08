@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+    <title>Hora UTC</title>
+  </head>
+  <body>
+     <div class="container"> 
+       <h1>Hora UTC</h1>
+       <form class="form-time">
+       	<div class="form-group">
+       		<label for="email">Time:</label>
+       		<input type="text" class="form-control" placeholder="Enter Time" id="hora" name="hora">
+       	</div>
+       	<div class="form-group">
+       		<label for="pwd">Time Zone:</label>
+       		<input type="text" class="form-control" placeholder="Enter Time zone" id="utc" name="utc">
+       	</div>
+       	<button type="submit" class="btn btn-primary">Submit</button>
+       	<input type="hidden" name="id">
+       </form> 
+     </div>
+     <article>
+     	<table class="time-table">
+     		<thead>
+     			<tr>
+     				<th>Hora</th>
+     				<th>UTC</th>
+     			</tr>
+     		</thead>
+     		<tbody></tbody>
+     	</table>
+     </article>
+
+     <template id="time-template">
+     	<tr>
+     		<td class="time"></td>
+     		<td class="timezone"></td>
+     	</tr>
+     </template>
+
+     <div class="col-sm-5" id="requisitos">
+
+     </div>
+    
+    <script>
+      const d = document,
+      $table = d.querySelector(".time-table"),
+      $form = d.querySelector(".form-time"),
+      $template = d.getElementById("time-template").content,
+      $fragment = d.createDocumentFragment();
+
+	  d.addEventListener("submit", async e => {
+      if (e.target === $form) {
+        e.preventDefault();
+
+        if (!e.target.id.value) {
+          //Create - POST
+          try {
+            let options = {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json; charset=utf-8"
+              },
+              body: JSON.stringify({
+                time: e.target.hora.value,
+                timezone: e.target.utc.value
+              })
+            },
+              res = await fetch("https://spring-format-transformet-serv.herokuapp.com/api/transform-time/json", options),
+              json = await res.json();
+
+              document.getElementById('requisitos').innerHTML = res.status;
+              console.log(res);
+              console.log(options);
+
+            if (!res.ok) throw { status: res.status, statusText: res.statusText };
+
+            //location.reload();
+          } catch (err) {
+            let message = err.statusText || "Ocurrió un error en post";
+            $form.insertAdjacentHTML("afterend", `<p><b>Error ${err.status}: ${message}</b></p>`);
+          }
+        } 
+      }
+    });
+
+  </script>
+    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+  </body>
+</html>
